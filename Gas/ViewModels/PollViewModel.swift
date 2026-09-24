@@ -1,75 +1,67 @@
-//
-//  PollViewModel.swift
-//  Gas
-//
-//  Created by Gas Team
-//
-
 import Foundation
 import Combine
 
-class PollViewModel: ObservableObject {
-    @Published var currentPoll: Poll?
+@MainActor
+final class PollViewModel: ObservableObject {
+    @Published var polls: [Poll] = []
     @Published var currentIndex = 0
-    @Published var coinsEarned = 18
-    
-    var totalPolls = 12
-    private var polls: [Poll] = []
-    
-    func loadPolls() {
-        // Mock data - in production, fetch from backend
-        polls = [
-            Poll(
-                id: "1",
-                question: "Best person to go camping with",
-                emoji: "⛺️",
-                options: [
-                    Poll.PollOption(id: "1", userId: "u1", userName: "Elena"),
-                    Poll.PollOption(id: "2", userId: "u2", userName: "Peggie"),
-                    Poll.PollOption(id: "3", userId: "u3", userName: "Quy"),
-                    Poll.PollOption(id: "4", userId: "u4", userName: "Angie")
-                ],
-                backgroundColor: "brown"
-            ),
-            Poll(
-                id: "2",
-                question: "Smiling 24/7",
-                emoji: "😊",
-                options: [
-                    Poll.PollOption(id: "1", userId: "u5", userName: "Gary"),
-                    Poll.PollOption(id: "2", userId: "u6", userName: "Taufik"),
-                    Poll.PollOption(id: "3", userId: "u7", userName: "Runina"),
-                    Poll.PollOption(id: "4", userId: "u8", userName: "Quy")
-                ],
-                backgroundColor: "blue"
-            )
-        ]
-        currentPoll = polls.first
-    }
-    
-    func submitResponse(selectedUserId: String) {
-        // In production, send to backend
-        print("User selected: \(selectedUserId)")
-        coinsEarned = Int.random(in: 15...25)
-    }
-    
-    func nextPoll() {
-        currentIndex += 1
-        if currentIndex < polls.count {
-            currentPoll = polls[currentIndex]
-        } else {
+    @Published var answered = 0
+    @Published var totalPolls = 12
+    @Published var isLoading = false
+    @Published var isSubmitting = false
+    @Published var coinsEarned: Int?
+    @Published var error: String?
+    var currentPoll: Poll? { polls.indices.contains(currentIndex) ? polls[currentIndex] : nil }
+
+    func load(_ auth: AuthViewModel) async {
+        guard !isLoading, !isSubmitting else { return }
+        let sessionToken = auth.api.token
+        isLoading = true
+        error = nil
+        defer { isLoading = false }
+        do {
+            let response: PollsResult = try await auth.api.request("/v1/polls")
+            guard auth.api.token == sessionToken else { return }
+            polls = response.polls
+            answered = response.answered
+            totalPolls = response.total
             currentIndex = 0
-            currentPoll = polls.first
+        } catch {
+            guard auth.api.token == sessionToken else { return }
+            self.error = error.localizedDescription
+            auth.handle(error)
         }
     }
-    
-    func shuffleOptions() {
-        guard var poll = currentPoll else { return }
-        poll.options.shuffle()
-        currentPoll = poll
+
+    func submit(_ option: Poll.PollOption, auth: AuthViewModel) async {
+        guard let poll = currentPoll, !isSubmitting else { return }
+        let sessionToken = auth.api.token
+        isSubmitting = true
+        defer { isSubmitting = false }
+        do {
+            let result: VoteResult = try await auth.api.request("/v1/votes", method: "POST", body: ["pollId": poll.id, "selectedUserId": option.userId])
+            guard auth.api.token == sessionToken else { return }
+            polls.removeAll { $0.id == poll.id }
+            if currentIndex >= polls.count { currentIndex = 0 }
+            answered += 1
+            coinsEarned = result.coinsEarned
+            await auth.refresh()
+        } catch {
+            guard auth.api.token == sessionToken else { return }
+            self.error = error.localizedDescription
+            auth.handle(error)
+            // Refresh before retrying: a lost response may still have committed the vote.
+            isSubmitting = false
+            await load(auth)
+        }
     }
-    
-    func skipPoll() {
-        nextPoll()
+
+    func nextPoll() {
+        guard !polls.isEmpty, !isSubmitting else { return }
+        currentIndex = (currentIndex + 1) % polls.count
+    }
+    func shuffleOptions() {
+        guard polls.indices.contains(currentIndex), !isSubmitting else { return }
+        polls[currentIndex].options.shuffle()
     }
 }

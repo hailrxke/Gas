@@ -94,3 +94,13 @@ iOSInjectionProject/
 
 # Firebase
 GoogleService-Info.plist
+
+# Local API data and Python environment
+.venv/
+__pycache__/
+*.pyc
+data/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+.env

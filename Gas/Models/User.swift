@@ -1,28 +1,19 @@
-//
-//  User.swift
-//  Gas
-//
-//  Created by Gas Team
-//
-
 import Foundation
 
 struct User: Identifiable, Codable {
     let id: String
-    var phoneNumber: String
-    var firstName: String
-    var lastName: String
-    var username: String
-    var gender: Gender
-    var age: Int
-    var school: School?
-    var profilePhotoURL: String?
-    var coins: Int
-    var friends: [String] // User IDs
-    
-    enum Gender: String, Codable {
-        case boy
-        case girl
-        case nonBinary
-    }
+    let username: String
+    let name: String
+    let school: String
+    let age: Int?
+    let coins: Int?
+}
+
+struct Session: Decodable { let token: String }
+struct Acknowledgement: Decodable { let ok: Bool }
+struct PeopleResult: Decodable { let people: [User] }
+struct FriendsResult: Decodable {
+    let friends: [User]
+    let requests: [User]
+    let sent: [User]
 }

@@ -1,53 +1,90 @@
-# Gas - iOS Social Polling App
+# Gas Korea MVP
 
-Gas is a social polling app for high school students in Korea, where friends answer anonymous polls about each other and receive notifications when they're picked.
+iOS-приложение на SwiftUI и сервер API на Python/SQLite для обмена анонимными комплиментами между пользователями, подтвердившими дружбу. Разработка продолжена от коммита `bf34acb`; прежние незакоммиченные сгенерированные файлы удалены.
 
-## Features
+Сейчас проект находится на стадии технической альфы. Основные серверные сценарии проверены автоматическими тестами и HTTP-проверкой. Сборка и работа iOS-приложения на устройстве ещё не подтверждены: в окружении разработки нет Xcode и Apple SDK.
 
-- **Age Verification**: Users must verify their age before accessing the app
-- **School-based Connection**: Find and connect with classmates by selecting your school
-- **Phone Verification**: SMS-based authentication
-- **User Profile**: Create profile with photo, name, username, and gender
-- **Friend Management**: Add friends from contacts and mutual connections
-- **Poll System**: Answer fun poll questions about your friends
-  - Multiple choice polls with 4 friend options
-  - Various question categories (e.g., "Best person to go camping with", "Smiling 24/7")
-  - Shuffle and skip options
-  - Track poll progress (e.g., "1 of 12")
-- **Flame Notifications**: Get notified when friends pick you ("A girl gassed you up" with flame emoji)
-- **Coin Rewards**: Earn coins for participating in polls
-- **Cash Out**: Redeem earned coins
-- **Three Tab Interface**:
-  - Inbox: View notifications and flames
-  - Gas: Main polling interface
-  - Profile: User settings and information
+## Что реализовано
 
-## Design
+- Регистрация и вход по логину и паролю, хеширование паролей, серверные сессии с ограниченным сроком действия и хранение токена в iOS Keychain.
+- Английский интерфейс; регистрация пользователей, указавших возраст от 14 до 19 лет.
+- Ручной ввод названия школы, поиск по точному логину в пределах одной школы, отправка и принятие заявок в друзья.
+- Двенадцать вопросов на английском, до четырёх реальных друзей в вариантах ответа, перемешивание вариантов и пропуск вопроса.
+- Одно голосование с наградой за каждый вопрос в течение календарного дня по времени Кореи. Сервер проверяет выбранный вариант и начисляет 20 монет в одной транзакции с сохранением голоса.
+- Получение комплиментов только по результатам реальных голосований. API входящих комплиментов не передаёт получателю идентификатор, имя, пол отправителя или точное время голосования.
+- Отметка прочтения, удаление друзей, блокировка, отправка жалоб, выход и удаление аккаунта с подтверждением паролем.
+- Сохранение данных в SQLite между перезапусками сервера. Демонстрационных аккаунтов, вымышленных голосов, имитации SMS, денежных выплат и подключения Firebase нет.
 
-- **Colors**: 
-  - Primary: Orange/Coral (#FF6347)
-  - Secondary: Light blue, brown tones for polls
-  - Background: Dark for splash screen, light for main app
-- **Logo**: "GAS" with flame-styled letters
-- **UI**: Clean, modern iOS design with rounded buttons and card-based layouts
+Названия школ вводят сами пользователи; проверки по официальной базе нет. Для взаимодействия двух аккаунтов названия должны совпадать. В небольшой группе друзей отправителя можно угадать по обстоятельствам. Оператор сервера имеет доступ к записям о голосованиях.
 
-## Technology Stack
+## Запуск сервера
 
-- SwiftUI for iOS
-- Firebase for authentication and backend
-- CoreLocation for school proximity detection
-- Contacts framework for friend suggestions
-- Push notifications for engagement
+Нужен Python 3.10 или новее с поддержкой SQLite и OpenSSL scrypt. Выполняйте команды из каталога, содержащего этот README (`Gas/`):
 
-## Setup
+```sh
+python3 server/app.py
+```
 
-1. Open Gas.xcodeproj in Xcode 14+
-2. Configure Firebase credentials
-3. Run on iOS 15+ device or simulator
+Сервер для разработки доступен по адресу `http://127.0.0.1:8080`. Данные сохраняются в `data/gas.sqlite3`. Установка сторонних Python-пакетов для этого режима не требуется. Запрос `GET /health` возвращает `{"status":"ok"}`.
 
-## Privacy
+Чтобы изменить порт или расположение базы данных, в Linux или macOS задайте переменные окружения:
 
-Gas prioritizes user privacy:
-- Location is only used to find nearby schools
-- Contacts are used only for friend suggestions
-- All data is encrypted and secure
+```sh
+GAS_DATABASE=/absolute/path/gas.sqlite3 PORT=8081 python3 server/app.py
+```
+
+## Запуск iOS-приложения
+
+1. Используйте macOS с Xcode 15 или новее и симулятором iOS 15 или новее. Версии Xcode, macOS и iOS должны быть совместимы между собой.
+2. Откройте `Gas.xcodeproj`, выберите схему `Gas`, симулятор iPhone и нажмите **Run**.
+3. Запустите API на том же компьютере. По умолчанию клиент обращается к `http://localhost:8080`.
+4. Зарегистрируйте аккаунт. Адрес API можно изменить кнопкой **Server Settings** на экране входа.
+5. Для запуска на физическом iPhone настройте команду разработчика для подписи приложения и укажите доступный телефону HTTPS-адрес сервера. Для локальной проверки в одной сети можно запустить API с `GAS_HOST=0.0.0.0` и использовать имя компьютера с окончанием `.local`, например `http://Your-Mac.local:8080`. Разрешите доступ к локальной сети, если появится запрос. Обычный HTTP предназначен только для локального тестирования.
+
+Если сервер работает на отдельном Linux-компьютере, `localhost` в симуляторе по-прежнему указывает на компьютер с macOS. На физическом iPhone `localhost` указывает на сам телефон. Укажите HTTPS-адрес сервера либо настройте доступное в локальной сети имя `.local`.
+
+Проект Xcode создаётся скриптом и находится в каталоге `Gas.xcodeproj`. После добавления или удаления Swift-файлов перегенерируйте его:
+
+```sh
+python3 scripts/generate_project.py
+```
+
+Сборка для симулятора из командной строки macOS:
+
+```sh
+xcodebuild -project Gas.xcodeproj -scheme Gas -configuration Debug \
+  -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+Эта команда проверяет сборку для симулятора и не создаёт подписанное приложение для установки на iPhone.
+
+## Проверка основного сценария
+
+Используйте два симулятора или устройства, подключённых к одному серверу. Также можно выходить и переключаться между аккаунтами на одном устройстве.
+
+1. Зарегистрируйте `student_a` и `student_b` с разными паролями и одинаковым названием школы.
+2. В аккаунте A откройте **Friends**, найдите `student_b` и отправьте заявку.
+3. В аккаунте B обновите **Friends** и примите заявку.
+4. В аккаунте A обновите **Polls** и проголосуйте за B. Аккаунту A начислятся 20 монет.
+5. В аккаунте B обновите **Inbox**. Там появится комплимент без указания отправителя.
+6. Перезапустите API и убедитесь, что аккаунты, дружеские связи и голоса сохранились.
+7. Проверьте отправку жалобы на комплимент, блокировку друга, выход и удаление аккаунта.
+
+## Автоматические проверки
+
+```sh
+python3 -m unittest discover -s server -v
+```
+
+Набор из 13 тестов проверяет авторизацию, валидацию, сохранение сессий, разделение пользователей по школам, подтверждение дружбы, одновременные повторные голоса, начисление наград, смену дня, доступ к входящим комплиментам, сокрытие отправителя, жалобы, блокировки и удаление аккаунта.
+
+В GitHub Actions настроены тесты API, HTTP-проверка и сборка iOS-приложения для симулятора. Workflow запускается при отправке изменений в GitHub или создании pull request. Само наличие конфигурации не означает, что удалённая проверка уже прошла. Результаты локальных проверок и их ограничения описаны в [docs/VALIDATION.md](docs/VALIDATION.md).
+
+## Развёртывание и ограничения
+
+Настройка Gunicorn, HTTPS, резервного копирования базы и просмотра жалоб описана в [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Формат запросов и ответов API — в [docs/API.md](docs/API.md).
+
+Это MVP для самостоятельного размещения. Публикация в App Store, подтверждение обучения в школе, SMS, восстановление пароля, загрузка фотографий, синхронизация контактов, APNs и платные подписки не реализованы. Монеты не имеют денежной стоимости. Фонового обновления нет; данные обновляются при предусмотренных интерфейсом действиях или вручную.
+
+Текст о приватности внутри приложения описывает текущую реализацию и не является готовой юридической политикой для публичного запуска. Перед таким запуском оператору необходимо указать сведения о себе и контактные данные, определить сроки хранения данных и организовать обработку жалоб. Соответствие законодательству не подтверждено.

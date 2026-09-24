@@ -1,22 +1,7 @@
-//
-//  School.swift
-//  Gas
-//
-//  Created by Gas Team
-//
-
 import Foundation
-import CoreLocation
 
+// School names are self-reported in the MVP, not proof of enrollment.
 struct School: Identifiable, Codable {
-    let id: String
-    var name: String
-    var location: String
-    var memberCount: Int
-    var logoURL: String?
-    
-    var coordinate: CLLocationCoordinate2D? {
-        // Would be populated from geocoding or database
-        nil
-    }
+    let name: String
+    var id: String { name }
 }

@@ -22,14 +22,6 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Gas needs your location to find nearby schools. Location is only used to find nearby schools and is never saved.</string>
-	<key>NSContactsUsageDescription</key>
-	<string>Gas needs access to your contacts to help you find friends. Your contacts are used to find friends and uploaded to a server.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Gas needs access to your camera to take profile photos.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Gas needs access to your photos to set your profile picture.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -38,10 +30,7 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIColorName</key>
-		<string>LaunchBackground</string>
-	</dict>
+	<dict/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -53,5 +42,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Connect to the Gas server on your local network during testing.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

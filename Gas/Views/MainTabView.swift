@@ -1,35 +1,21 @@
-//
-//  MainTabView.swift
-//  Gas
-//
-//  Created by Gas Team
-//
-
 import SwiftUI
 
 struct MainTabView: View {
-    @State private var selectedTab = 1
-    
+    @EnvironmentObject var auth: AuthViewModel
+    @Environment(\.scenePhase) private var scenePhase
     var body: some View {
-        TabView(selection: $selectedTab) {
-            InboxView()
-                .tabItem {
-                    Text("Inbox")
-                }
-                .tag(0)
-            
-            PollView()
-                .tabItem {
-                    Text("Gas")
-                }
-                .tag(1)
-            
-            ProfileView()
-                .tabItem {
-                    Text("Profile")
-                }
-                .tag(2)
+        TabView {
+            PollView().tabItem { Label("Polls", systemImage: "flame.fill") }
+            InboxView().tabItem { Label("Inbox", systemImage: "tray.fill") }
+                .badge(auth.flames.filter { !$0.isRead }.count)
+            FriendsView().tabItem { Label("Friends", systemImage: "person.2.fill") }
+                .badge(auth.requests.count)
+            ProfileView().tabItem { Label("Profile", systemImage: "person.crop.circle") }
         }
-        .accentColor(.orange)
+        .tint(.orange)
+        .task { await auth.refresh() }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active { Task { await auth.refresh() } }
+        }
     }
 }
