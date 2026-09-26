@@ -7,8 +7,8 @@ struct OnboardingFlow: View {
     @State private var password = ""
     @State private var confirmation = ""
     @State private var name = ""
-    @State private var school = ""
-    @State private var age = 16
+    @State private var school: School?
+    @State private var birthDate = Calendar.current.date(byAdding: .year, value: -16, to: Date()) ?? Date()
     @State private var consent = false
     @State private var showServer = false
     @State private var address = APIClient.configuredServer
@@ -17,7 +17,7 @@ struct OnboardingFlow: View {
         let usernameValid = username.range(of: "^[a-zA-Z0-9_]{3,24}$", options: .regularExpression) != nil
         return usernameValid && password.count >= 10 && password.count <= 128 &&
             (!register || (!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-             school.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2 &&
+             school != nil &&
              password == confirmation && consent))
     }
 
@@ -39,7 +39,7 @@ struct OnboardingFlow: View {
                         Text("Sign Up").tag(true)
                     }.pickerStyle(.segmented)
                 }
-                Section(footer: Text("Usernames must be 3–24 letters, numbers, or underscores. Passwords must be 10–128 characters. Password recovery is not available yet, so keep your password safe.")) {
+                Section(footer: Text("Usernames must be 3–24 letters, numbers, or underscores. Passwords must be 10–128 characters. Save the recovery code shown after sign-up; you will need it if you forget your password.")) {
                     TextField("Username", text: $username)
                         .textContentType(.username)
                         .textInputAutocapitalization(.never)
@@ -52,10 +52,10 @@ struct OnboardingFlow: View {
                     }
                 }
                 if register {
-                    Section(header: Text("Profile"), footer: Text("Enter your school’s full name exactly as your friends do. School names are self-reported; enrollment is not verified.")) {
+                    Section("Profile") {
                         TextField("Name or nickname", text: $name)
-                        TextField("School name", text: $school)
-                        AgeVerificationView(age: $age)
+                        NavigationLink(school?.displayName ?? "Choose School") { SchoolPickerView(selection: $school) }
+                        AgeVerificationView(birthDate: $birthDate)
                     }
                     Section {
                         NavigationLink("Privacy information") { PrivacyView() }
@@ -65,7 +65,7 @@ struct OnboardingFlow: View {
                 Section {
                     Button {
                         Task {
-                            await auth.authenticate(register: register, username: username, password: password, name: name, school: school, age: age)
+                            await auth.authenticate(register: register, username: username, password: password, name: name, schoolId: school?.id ?? "", birthDate: AgeVerificationView.value(birthDate))
                             if auth.isAuthenticated { password = ""; confirmation = "" }
                         }
                     } label: {
@@ -79,10 +79,12 @@ struct OnboardingFlow: View {
                     }.disabled(!canSubmit || auth.isBusy)
                 }
                 Section {
+                    NavigationLink("Forgot password?") { RecoverAccountView() }
                     Button("Server Settings") { showServer = true }
                 }
             }
-            .navigationBarHidden(true)
+            .navigationTitle("Welcome")
+            .navigationBarTitleDisplayMode(.inline)
             .disabled(auth.isBusy)
             .sheet(isPresented: $showServer) {
                 NavigationView {
@@ -94,7 +96,7 @@ struct OnboardingFlow: View {
                                 .disableAutocorrection(true)
                         }
                         Button("Save") {
-                            Task { await auth.configureServer(address); showServer = false }
+                            Task { await auth.configureServer(address); school = nil; showServer = false }
                         }
                     }
                     .navigationTitle("Server Connection")

@@ -10,13 +10,13 @@ struct FriendsView: View {
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("Find friends at your school"), footer: Text("Make sure you and your friends entered exactly the same school name.")) {
+                Section(header: Text("Find friends at your school"), footer: Text("Search by name or username within your selected school.")) {
                     HStack {
-                        TextField("Exact username", text: $query)
+                        TextField("Name or username", text: $query)
                             .textInputAutocapitalization(.never)
                             .disableAutocorrection(true)
                         Button("Search") { Task { await search() } }
-                            .disabled(query.count < 3 || searching)
+                            .disabled(query.count < 2 || searching)
                     }
                     if searching { ProgressView() }
                     if searched && results.isEmpty { Text("No matching friends found.").foregroundColor(.secondary) }
@@ -34,6 +34,7 @@ struct FriendsView: View {
                         }
                     }
                 }
+                Section { NavigationLink("Invitations") { InviteView() } }
                 Section("Incoming requests") {
                     if auth.requests.isEmpty { Text("No incoming requests.").foregroundColor(.secondary) }
                     ForEach(auth.requests) { person in
@@ -48,7 +49,7 @@ struct FriendsView: View {
                     }
                 }
                 Section("Friends · \(auth.friends.count)") {
-                    if auth.friends.isEmpty { Text("Once a friend accepts, you can vote about each other.").foregroundColor(.secondary) }
+                    if auth.friends.isEmpty { Text("Connect with at least four accepted friends to unlock polls.").foregroundColor(.secondary) }
                     ForEach(auth.friends) { person in
                         personLabel(person)
                             .swipeActions {
@@ -105,8 +106,7 @@ struct FriendsView: View {
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
         defer { searching = false }
         do {
-            let encoded = term.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-            let response: PeopleResult = try await auth.api.request("/v1/people?q=\(encoded)")
+            let response: PeopleResult = try await auth.api.request(APIClient.path("/v1/people", query: ["q": term]))
             guard query.trimmingCharacters(in: .whitespacesAndNewlines) == term else { return }
             results = response.people
             searched = true

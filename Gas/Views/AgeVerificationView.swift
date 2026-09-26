@@ -1,15 +1,17 @@
 import SwiftUI
 
 struct AgeVerificationView: View {
-    @Binding var age: Int
+    @Binding var birthDate: Date
     var body: some View {
-        Picker("Age", selection: $age) {
-            ForEach(14...19, id: \.self) { value in
-                Text("\(value) years old").tag(value)
-            }
-        }
-        Text("This MVP is for students ages 14–19.")
-            .font(.footnote)
-            .foregroundColor(.secondary)
+        DatePicker("Date of birth", selection: $birthDate, in: ...Date(), displayedComponents: .date)
+        Text("For students ages 14–19. Your date of birth is private and is not shown to other students.")
+            .font(.footnote).foregroundColor(.secondary)
+    }
+    static func value(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
     }
 }

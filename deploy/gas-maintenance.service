@@ -1,0 +1,15 @@
+[Unit]
+Description=GAS verified backup and retention maintenance
+
+[Service]
+Type=oneshot
+User=gas
+Group=gas
+WorkingDirectory=/opt/gas
+ExecStart=/opt/gas/.venv/bin/python scripts/maintenance.py --database /var/lib/gas/gas.sqlite3 --backups /var/lib/gas/backups --keep-days 7
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/gas

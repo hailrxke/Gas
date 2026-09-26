@@ -1,0 +1,4 @@
+[
+  {"id":"demo:school-a","name":"Demo School A","englishName":"Demo School A","region":"Local testing only","address":"Not an official school","kind":"Demo"},
+  {"id":"demo:school-b","name":"Demo School B","englishName":"Demo School B","region":"Local testing only","address":"Not an official school","kind":"Demo"}
+]

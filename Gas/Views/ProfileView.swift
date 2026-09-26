@@ -2,10 +2,8 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var auth: AuthViewModel
-    @State private var deleting = false
-    @State private var confirmingDelete = false
-    @State private var password = ""
-
+    @State private var reminder = DailyReminder.enabled
+    @State private var updatingReminder = false
     var body: some View {
         NavigationView {
             List {
@@ -14,39 +12,41 @@ struct ProfileView: View {
                         Label(user.name, systemImage: "person.crop.circle.fill").font(.title2.bold())
                         Text("@\(user.username)")
                         Text(user.school).foregroundColor(.secondary)
+                        NavigationLink("Edit Profile") { EditProfileView() }
                     }
                     Section("Activity") {
                         Label("\(user.coins ?? 0) coins", systemImage: "star.circle.fill")
                         Text("Friends: \(auth.friends.count)")
-                        Text("Coins are participation points and have no cash value.").font(.footnote).foregroundColor(.secondary)
+                        NavigationLink("Coin History") { LedgerView() }
                     }
+                    if user.hasRecoveryCode != true {
+                        Text("Protect your account: create a recovery code in Password & Recovery.").foregroundColor(.orange)
+                    }
+                }
+                Section("Account") {
+                    NavigationLink("Password & Recovery") { PasswordView() }
+                    NavigationLink("Active Sessions") { SessionsView() }
+                    NavigationLink("My Reports") { ReportsView() }
+                    NavigationLink("Export or Delete My Data") { AccountDataView() }
+                }
+                Section(footer: Text("A reminder at 8 PM in your device’s time zone. This is not a notification about incoming compliments.")) {
+                    Toggle("Daily poll reminder", isOn: Binding(get: { reminder }, set: { value in
+                        Task {
+                            updatingReminder = true
+                            defer { updatingReminder = false }
+                            do {
+                                if value { try await DailyReminder.enable() }
+                                else { DailyReminder.disable() }
+                                reminder = DailyReminder.enabled
+                            } catch { auth.handle(error) }
+                        }
+                    })).disabled(updatingReminder)
                 }
                 Section {
-                    NavigationLink("Privacy information") { PrivacyView() }
+                    NavigationLink("Privacy Information") { PrivacyView() }
                     Button("Log Out") { Task { await auth.signOut() } }.disabled(auth.isBusy)
-                    Button("Delete Account", role: .destructive) { deleting = true }.disabled(auth.isBusy)
                 }
-            }
-            .navigationTitle("Profile")
-            .refreshable { await auth.refresh() }
-            .sheet(isPresented: $deleting) {
-                NavigationView {
-                    Form {
-                        if let error = auth.error { Text(error).foregroundColor(.red) }
-                        Text("This deletes your account, friendships, and related voting records. This action cannot be undone.")
-                        SecureField("Current password", text: $password).textContentType(.password)
-                        Button("Continue", role: .destructive) { confirmingDelete = true }
-                            .disabled(password.count < 10 || auth.isBusy)
-                    }
-                    .navigationTitle("Delete Account")
-                    .toolbar { Button("Cancel") { deleting = false; password = "" } }
-                    .confirmationDialog("Permanently delete your account?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-                        Button("Delete Permanently", role: .destructive) {
-                            Task { await auth.signOut(delete: true, password: password); password = "" }
-                        }
-                    }
-                }
-            }
+            }.navigationTitle("Profile").refreshable { await auth.refresh() }
         }.navigationViewStyle(.stack)
     }
 }

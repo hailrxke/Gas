@@ -18,9 +18,17 @@ struct PollsResult: Decodable {
     let polls: [Poll]
     let answered: Int
     let total: Int
+    let day: String
+    let skipped: Int
+    let minimumFriends: Int
+    let friendCount: Int
 }
 struct VoteResult: Decodable { let coinsEarned: Int }
-struct InboxResult: Decodable { let flames: [Flame] }
+struct InboxResult: Codable {
+    let flames: [Flame]
+    let unreadCount: Int
+    let nextCursor: String?
+}
 struct Flame: Identifiable, Codable {
     let id: String
     let pollQuestion: String

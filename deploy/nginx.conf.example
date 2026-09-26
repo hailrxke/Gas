@@ -1,0 +1,24 @@
+# Replace domain and certificate paths. Install in nginx's http configuration.
+# Obtain a trusted certificate separately; this file does not provision one.
+server {
+    listen 443 ssl;
+    server_name gas.example.com;
+    ssl_certificate /etc/letsencrypt/live/gas.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/gas.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    client_max_body_size 16k;
+    client_header_timeout 10s;
+    client_body_timeout 10s;
+    access_log off;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        # Overwrite a client-supplied header; GAS_TRUSTED_PROXIES=127.0.0.1.
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 35s;
+        proxy_send_timeout 35s;
+        proxy_cache off;
+    }
+}

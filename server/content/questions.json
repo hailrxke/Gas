@@ -1,0 +1,290 @@
+[
+  {
+    "id": "1",
+    "question": "Who would you like to go camping with?",
+    "emoji": "⛺️",
+    "color": "brown"
+  },
+  {
+    "id": "2",
+    "question": "Who always has a smile on their face?",
+    "emoji": "😊",
+    "color": "blue"
+  },
+  {
+    "id": "3",
+    "question": "Who is a great listener?",
+    "emoji": "👂",
+    "color": "purple"
+  },
+  {
+    "id": "4",
+    "question": "Who has a great sense of style?",
+    "emoji": "✨",
+    "color": "pink"
+  },
+  {
+    "id": "5",
+    "question": "Who gives the best music recommendations?",
+    "emoji": "🎵",
+    "color": "blue"
+  },
+  {
+    "id": "6",
+    "question": "Who is always fun to be around?",
+    "emoji": "😂",
+    "color": "brown"
+  },
+  {
+    "id": "7",
+    "question": "Who takes good care of the people around them?",
+    "emoji": "🌍",
+    "color": "purple"
+  },
+  {
+    "id": "8",
+    "question": "Who gives thoughtful advice?",
+    "emoji": "💡",
+    "color": "blue"
+  },
+  {
+    "id": "9",
+    "question": "Who encourages you to try something new?",
+    "emoji": "🏔",
+    "color": "brown"
+  },
+  {
+    "id": "10",
+    "question": "Who comes up with creative ideas?",
+    "emoji": "🎨",
+    "color": "purple"
+  },
+  {
+    "id": "11",
+    "question": "Who would you like to share a snack with?",
+    "emoji": "🍕",
+    "color": "pink"
+  },
+  {
+    "id": "12",
+    "question": "Who always has something kind to say?",
+    "emoji": "💬",
+    "color": "blue"
+  },
+  {
+    "id": "13",
+    "question": "Who helps others feel included?",
+    "emoji": "🤝",
+    "color": "purple"
+  },
+  {
+    "id": "14",
+    "question": "Who makes group projects more enjoyable?",
+    "emoji": "🧩",
+    "color": "brown"
+  },
+  {
+    "id": "15",
+    "question": "Who notices when someone needs a hand?",
+    "emoji": "🙌",
+    "color": "pink"
+  },
+  {
+    "id": "16",
+    "question": "Who would make a great travel companion?",
+    "emoji": "🧭",
+    "color": "blue"
+  },
+  {
+    "id": "17",
+    "question": "Who brings a fresh perspective?",
+    "emoji": "🔭",
+    "color": "purple"
+  },
+  {
+    "id": "18",
+    "question": "Who celebrates their friends’ achievements?",
+    "emoji": "🎉",
+    "color": "brown"
+  },
+  {
+    "id": "19",
+    "question": "Who would you ask for a book recommendation?",
+    "emoji": "📚",
+    "color": "pink"
+  },
+  {
+    "id": "20",
+    "question": "Who makes ordinary days memorable?",
+    "emoji": "🌟",
+    "color": "blue"
+  },
+  {
+    "id": "21",
+    "question": "Who is patient when explaining something?",
+    "emoji": "📝",
+    "color": "purple"
+  },
+  {
+    "id": "22",
+    "question": "Who inspires you to keep learning?",
+    "emoji": "🌱",
+    "color": "brown"
+  },
+  {
+    "id": "23",
+    "question": "Who makes you feel welcome?",
+    "emoji": "🏡",
+    "color": "pink"
+  },
+  {
+    "id": "24",
+    "question": "Who would be fun to cook with?",
+    "emoji": "🍳",
+    "color": "blue"
+  },
+  {
+    "id": "25",
+    "question": "Who would you pick for a creative project?",
+    "emoji": "🖌️",
+    "color": "purple"
+  },
+  {
+    "id": "26",
+    "question": "Who is good at bringing people together?",
+    "emoji": "🫶",
+    "color": "brown"
+  },
+  {
+    "id": "27",
+    "question": "Who finds something positive in a tough day?",
+    "emoji": "🌤️",
+    "color": "pink"
+  },
+  {
+    "id": "28",
+    "question": "Who would be a great teammate?",
+    "emoji": "🏐",
+    "color": "blue"
+  },
+  {
+    "id": "29",
+    "question": "Who remembers the little things that matter?",
+    "emoji": "💌",
+    "color": "purple"
+  },
+  {
+    "id": "30",
+    "question": "Who would you explore a new hobby with?",
+    "emoji": "🪁",
+    "color": "brown"
+  },
+  {
+    "id": "31",
+    "question": "Who asks thoughtful questions?",
+    "emoji": "🧠",
+    "color": "pink"
+  },
+  {
+    "id": "32",
+    "question": "Who makes others feel appreciated?",
+    "emoji": "🌷",
+    "color": "blue"
+  },
+  {
+    "id": "33",
+    "question": "Who would be fun to visit a museum with?",
+    "emoji": "🏛️",
+    "color": "purple"
+  },
+  {
+    "id": "34",
+    "question": "Who shares what they know generously?",
+    "emoji": "🎁",
+    "color": "brown"
+  },
+  {
+    "id": "35",
+    "question": "Who stays kind when things get stressful?",
+    "emoji": "🕊️",
+    "color": "pink"
+  },
+  {
+    "id": "36",
+    "question": "Who brings enthusiasm to new ideas?",
+    "emoji": "🚀",
+    "color": "blue"
+  },
+  {
+    "id": "37",
+    "question": "Who would you trust to plan a fun afternoon?",
+    "emoji": "🗓️",
+    "color": "purple"
+  },
+  {
+    "id": "38",
+    "question": "Who makes everyone feel part of the team?",
+    "emoji": "🧡",
+    "color": "brown"
+  },
+  {
+    "id": "39",
+    "question": "Who would make a great study partner?",
+    "emoji": "✏️",
+    "color": "pink"
+  },
+  {
+    "id": "40",
+    "question": "Who is good at finding creative solutions?",
+    "emoji": "🔧",
+    "color": "blue"
+  },
+  {
+    "id": "41",
+    "question": "Who would you enjoy taking a walk with?",
+    "emoji": "🌳",
+    "color": "purple"
+  },
+  {
+    "id": "42",
+    "question": "Who is always willing to lend a hand?",
+    "emoji": "🛠️",
+    "color": "brown"
+  },
+  {
+    "id": "43",
+    "question": "Who helps you see things differently?",
+    "emoji": "🌈",
+    "color": "pink"
+  },
+  {
+    "id": "44",
+    "question": "Who would you learn a new skill with?",
+    "emoji": "🎯",
+    "color": "blue"
+  },
+  {
+    "id": "45",
+    "question": "Who makes time for their friends?",
+    "emoji": "⌛",
+    "color": "purple"
+  },
+  {
+    "id": "46",
+    "question": "Who shares the best small discoveries?",
+    "emoji": "🔎",
+    "color": "brown"
+  },
+  {
+    "id": "47",
+    "question": "Who makes a rainy day feel brighter?",
+    "emoji": "☀️",
+    "color": "pink"
+  },
+  {
+    "id": "48",
+    "question": "Who encourages others to be themselves?",
+    "emoji": "🦋",
+    "color": "blue"
+  }
+]

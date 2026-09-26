@@ -78,6 +78,11 @@ final class APIClient {
     }
 
     func request<T: Decodable>(_ path: String, method: String = "GET", body: [String: Any]? = nil) async throws -> T {
+        let data = try await requestData(path, method: method, body: body)
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    func requestData(_ path: String, method: String = "GET", body: [String: Any]? = nil) async throws -> Data {
         guard let url = URL(string: server + path) else {
             throw APIError(status: 0, message: "Please check the server address.")
         }
@@ -90,13 +95,30 @@ final class APIClient {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        let (data, response) = try await URLSession.shared.data(for: request)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        let (data, response) = try await Self.session.data(for: request)
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         guard (200..<300).contains(response.statusCode) else {
             let error = try? JSONDecoder().decode(ErrorBody.self, from: data)
             throw APIError(status: response.statusCode, message: error?.error ?? "Could not connect to the server.")
         }
-        return try JSONDecoder().decode(T.self, from: data)
+        return data
+    }
+
+    private static let session: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.httpCookieStorage = nil
+        return URLSession(configuration: configuration)
+    }()
+
+    static func path(_ path: String, query: [String: String]) -> String {
+        var components = URLComponents()
+        components.path = path
+        components.queryItems = query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) }
+        // URLComponents leaves literal '+' unescaped; form-style query parsers interpret it as a space.
+        components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        return components.string ?? path
     }
 
     private struct ErrorBody: Decodable { let error: String }

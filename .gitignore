@@ -104,3 +104,8 @@ data/
 *.sqlite3-wal
 *.sqlite3-shm
 .env
+
+# Private backups and exported catalogs
+*.bak
+backups/
+neis-schools.json

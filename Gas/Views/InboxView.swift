@@ -4,6 +4,7 @@ struct InboxView: View {
     @EnvironmentObject var auth: AuthViewModel
     @State private var reporting: Flame?
     @State private var reason = ""
+    @State private var loadingMore = false
 
     var body: some View {
         NavigationView {
@@ -33,9 +34,21 @@ struct InboxView: View {
                     }.padding(.vertical, 8)
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                if auth.nextCursor != nil {
+                    Button(loadingMore ? "Loading…" : "Load Older Compliments") {
+                        Task { loadingMore = true; await auth.loadInbox(append: true); loadingMore = false }
+                    }.disabled(loadingMore || auth.isOffline).padding(8)
+                }
+            }
+            .searchable(text: $auth.inboxQuery, prompt: "Search compliments")
+            .task(id: auth.inboxQuery) {
+                do { try await Task.sleep(nanoseconds: 300_000_000); await auth.loadInbox() }
+                catch { return }
+            }
             .navigationTitle("Inbox")
             .refreshable { await auth.refresh() }
-            .task { await auth.refresh() }
+
             .sheet(item: $reporting) { flame in
                 NavigationView {
                     Form {

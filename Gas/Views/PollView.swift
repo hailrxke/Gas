@@ -36,22 +36,27 @@ struct PollView: View {
                             }
                             if model.isSubmitting { ProgressView("Sending…") }
                             HStack {
-                                Button("Shuffle", action: model.shuffleOptions)
+                                Button("Change options") { Task { await model.change("shuffle", auth: auth) } }
+                                    .disabled(model.friendCount <= 4)
                                 Spacer()
-                                Button("Skip", action: model.nextPoll)
+                                Button("Skip") { Task { await model.change("skip", auth: auth) } }
                             }.disabled(model.isSubmitting || model.coinsEarned != nil)
                         } else {
                             Image(systemName: model.answered == model.totalPolls ? "checkmark.circle.fill" : "person.2.fill")
                                 .font(.system(size: 64))
-                            Text(model.answered == model.totalPolls ? "You’ve finished today’s polls!" : "Connect with a friend to get started")
+                            Text(model.answered == model.totalPolls ? "You’ve finished today’s polls!" : (model.skipped > 0 ? "You’ve skipped the remaining polls" : "Connect with at least \(model.minimumFriends) friends"))
                                 .font(.title2.bold())
-                            Text(model.answered == model.totalPolls ? "Polls reopen at midnight Korea time." : "Search for a schoolmate’s username in the Friends tab and accept each other’s request.")
+                            Text(model.answered == model.totalPolls ? "Polls reopen at midnight Korea time." : "Find schoolmates in Friends and accept each other’s request. You have \(model.friendCount) accepted friends.")
                                 .multilineTextAlignment(.center)
+                        }
+                        if model.skipped > 0 {
+                            Button("Restore skipped polls (\(model.skipped))") { Task { await model.change("restore", auth: auth) } }
+                                .disabled(model.isSubmitting || model.isLoading)
                         }
                         if let error = model.error {
                             Text(error).font(.footnote)
                         }
-                        Button("Refresh") { Task { await model.load(auth) } }
+                        Button("Refresh") { model.error = nil; Task { await model.load(auth) } }
                             .disabled(model.isLoading || model.isSubmitting)
                     }.padding(24)
                 }.foregroundColor(.white)

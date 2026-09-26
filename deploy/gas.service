@@ -1,0 +1,21 @@
+[Unit]
+Description=GAS API
+After=network.target
+
+[Service]
+User=gas
+Group=gas
+WorkingDirectory=/opt/gas/server
+EnvironmentFile=/etc/gas.env
+ExecStart=/opt/gas/.venv/bin/gunicorn --bind 127.0.0.1:8080 --preload --workers 2 --threads 2 --timeout 30 wsgi:application
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/gas
+
+[Install]
+WantedBy=multi-user.target
