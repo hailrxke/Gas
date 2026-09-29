@@ -64,14 +64,7 @@ final class APIClient {
     }
 
     func configure(_ address: String) throws {
-        let cleaned = address.trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        guard let url = URL(string: cleaned), let host = url.host,
-              url.user == nil, url.password == nil, url.query == nil, url.fragment == nil,
-              url.path.isEmpty,
-              url.scheme == "https" || (url.scheme == "http" && (host == "localhost" || host.hasSuffix(".local") || host == "127.0.0.1")) else {
-            throw APIError(status: 0, message: "Enter an HTTPS address. For local testing, use http://localhost:8080 or a .local address.")
-        }
+        let cleaned = try ServerAddress.normalize(address)
         server = cleaned
         UserDefaults.standard.set(cleaned, forKey: "gas.server")
         token = SessionStore.read(server: cleaned)
@@ -83,7 +76,8 @@ final class APIClient {
     }
 
     func requestData(_ path: String, method: String = "GET", body: [String: Any]? = nil) async throws -> Data {
-        guard let url = URL(string: server + path) else {
+        let validatedServer = try ServerAddress.normalize(server)
+        guard let url = URL(string: validatedServer + path) else {
             throw APIError(status: 0, message: "Please check the server address.")
         }
         var request = URLRequest(url: url)

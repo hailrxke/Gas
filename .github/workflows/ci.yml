@@ -21,5 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: python3 scripts/generate_project.py
       - run: plutil -lint Gas/Info.plist Gas.xcodeproj/project.pbxproj
+      - name: Check Debug and Release server address policies
+        run: bash scripts/check_server_address.sh
       - name: Build for iOS Simulator
         run: xcodebuild -project Gas.xcodeproj -scheme Gas -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build

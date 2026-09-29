@@ -89,7 +89,7 @@ struct OnboardingFlow: View {
             .sheet(isPresented: $showServer) {
                 NavigationView {
                     Form {
-                        Section(footer: Text("Enter the HTTPS address provided by the service operator. For a local server running on the simulator’s Mac, use http://localhost:8080.")) {
+                        Section(footer: Text(ServerAddress.guidance)) {
                             TextField("Server address", text: $address)
                                 .keyboardType(.URL)
                                 .textInputAutocapitalization(.never)
