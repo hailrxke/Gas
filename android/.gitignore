@@ -1,0 +1,12 @@
+.gradle/
+.kotlin/
+.tools/
+.idea/
+**/build/
+local.properties
+*.iml
+*.jks
+*.keystore
+# The repository ignores server data directories by name; these are source packages.
+!app/src/**/data/
+!app/src/**/data/**
