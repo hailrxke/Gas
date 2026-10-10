@@ -109,3 +109,6 @@ data/
 *.bak
 backups/
 neis-schools.json
+
+# Local feedback and design references
+/feedback/
