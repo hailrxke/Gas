@@ -15,6 +15,9 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v3
+        with:
+          # Override v3's default: the obsolete "tools" package is no longer available.
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
       - name: Build Android and run client/API checks
         working-directory: android
         run: bash ./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug
